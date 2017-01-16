@@ -1,6 +1,6 @@
 {
   "name": "marvin-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple, effective, colorful and cross-platform logger for nodejs",
   "main": "index.js",
   "scripts": {
