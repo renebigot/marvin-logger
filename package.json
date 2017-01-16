@@ -1,0 +1,28 @@
+{
+  "name": "marvin-logger",
+  "version": "1.0.0",
+  "description": "Simple, effective, colorful and cross-platform logger for nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter nyan",
+    "autotest": "supervisor -q -n exit -x mocha -- --reporter=nyan",
+    "autotest-cov": "supervisor -w ./index.js,./test -q -n exit -x istanbul -- cover _mocha",
+    "readme": "node ./node_modules/.bin/node-readme"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/renebigot/marvin-logger.git"
+  },
+  "author": "René BIGOT",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "file-stream-rotator": "0.0.7"
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.2.0",
+    "node-readme": "^0.1.9",
+    "supervisor": "^0.12.0"
+  }
+}
