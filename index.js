@@ -167,7 +167,7 @@ class Marvin {
         // Create log stream
         this._logStream = FileStreamRotator.getStream({
           date_format: 'YYYY-MM-DD',
-          filename: path.resolve(this._logOutputDirectory, './PID_' + process.pid + '-%DATE%.log'),
+          filename: path.resolve(this._logOutputDirectory, './%DATE%.log'),
           frequency: 'daily',
           verbose: false
         });
