@@ -2,7 +2,7 @@
 
 ![npm](https://img.shields.io/npm/v/marvin-logger.svg) ![license](https://img.shields.io/npm/l/marvin-logger.svg) ![github-issues](https://img.shields.io/github/issues/renebigot/marvin-logger.svg)
 
-Simple and effective nodejs logger
+Simple, effective, colorful and cross-platform logger for nodejs
 
 ![nodei.co](https://nodei.co/npm/marvin-logger.png?downloads=true&downloadRank=true&stars=true)
 
@@ -22,7 +22,6 @@ Simple and effective nodejs logger
 * Log to console
 * Log to file
 * "Rotate" log files
-* Create one file per PID (usefull for clustered app)
 * Colorize logs by levels (debug, info, warning, error, important, http)
 
 
@@ -71,6 +70,12 @@ var Marvin = require('marvin-logger'),
 In this example, only `error()`, `important()` and `http()` will be able to display information.
 
 `important()` and `http()` are always shown. You can use them to display important data like critical states or http access (or what ever you want).
+
+If the log data begins with brackets ('[...]'), only the text between the brackets will be colorized.
+
+```javascript
+logger.important('[MyApp] Super important log message'); // Only 'MyApp' will be shown in magenta  
+```
 
 
 ## Scripts
