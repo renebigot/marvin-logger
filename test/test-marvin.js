@@ -595,7 +595,7 @@ describe('File logging', function() {
         '-' + ('0' + (now.getMonth() + 1)).slice(-2) +
         '-' + ('0' + now.getDate()).slice(-2);
 
-    assert.ok(fs.existsSync('./test-tmp/PID_' + process.pid + '-' + formattedDate + '.log'));
+    assert.ok(fs.existsSync('./test-tmp/' + formattedDate + '.log'));
     deleteFolderRecursive('./test-tmp/');
     done();
   });
