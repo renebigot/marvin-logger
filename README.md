@@ -1,6 +1,6 @@
 # marvin-logger
 
-![npm](https://img.shields.io/npm/v/marvin-logger.svg) ![license](https://img.shields.io/npm/l/marvin-logger.svg) ![github-issues](https://img.shields.io/github/issues/renebigot/marvin-logger.svg)
+![npm](https://img.shields.io/npm/v/marvin-logger.svg) ![license](https://img.shields.io/npm/l/marvin-logger.svg) ![github-issues](https://img.shields.io/github/issues/renebigot/marvin-logger.svg) ![travis-status](https://img.shields.io/travis/renebigot/marvin-logger.svg)
 
 Simple, effective, colorful and cross-platform logger for nodejs
 
@@ -80,7 +80,7 @@ logger.important('[MyApp] Super important log message'); // Only 'MyApp' will be
 
 ## Scripts
 
- - **npm run test** : `mocha --reporter nyan`
+ - **npm run test** : `mocha`
  - **npm run autotest** : `supervisor -q -n exit -x mocha -- --reporter=nyan`
  - **npm run autotest-cov** : `supervisor -w ./index.js,./test -q -n exit -x istanbul -- cover _mocha`
  - **npm run readme** : `node ./node_modules/.bin/node-readme`
