@@ -21,6 +21,7 @@ Simple, effective, colorful and cross-platform logger for nodejs
 
 * Log to console
 * Log to file
+* Works as a middleware with expressjs
 * "Rotate" log files
 * Colorize logs by levels (debug, info, warning, error, important, http)
 
