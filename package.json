@@ -17,12 +17,16 @@
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
-    "file-stream-rotator": "0.0.7"
+    "file-stream-rotator": "0.0.7",
+    "on-finished": "^2.3.0",
+    "on-headers": "^1.0.1"
   },
   "devDependencies": {
+    "express": "^4.14.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "node-readme": "^0.1.9",
+    "supertest": "^2.0.1",
     "supervisor": "^0.12.0"
   }
 }

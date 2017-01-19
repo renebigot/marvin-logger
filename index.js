@@ -1,5 +1,7 @@
 const fs = require('fs'),
       path = require('path'),
+      onFinished = require('on-finished'),
+      onHeaders = require('on-headers'),
       FileStreamRotator = require('file-stream-rotator'),
       colors = require('colors/safe'),
       DEBUG = 0,
@@ -39,6 +41,53 @@ class Marvin {
     });
 
   }
+
+  ////////
+  expressMiddleWare() {
+    var that = this;
+    return function logger(req, res, next) {
+      // request data
+      req._startAt = undefined;
+      req._startTime = undefined;
+      req._remoteAddress = that._getip(req);
+
+      // response data
+      res._startAt = undefined;
+      res._startTime = undefined;
+
+      // record request start
+      that._recordStartTime.call(req);
+
+      // record response start
+      onHeaders(res, that._recordStartTime);
+
+      // log when response finished
+      function _logRequest() {
+        var responseTime = (req._startAt && res._startAt)
+        ? ((res._startAt[0] - req._startAt[0]) * 1e3 + (res._startAt[1] - req._startAt[1]) * 1e-6).toFixed(2)
+        : 0,
+            url = req.originalUrl || req.url,
+            status = res._header ? String(res.statusCode) : undefined;
+
+        var line = '[' + req.method + '] ' + url + ' (' + responseTime + ' ms) ' + status + ' ' + that._getip(req);
+        that.http(line)
+      };
+
+      onFinished(res, _logRequest);
+
+      next();
+    }
+  }
+
+  _recordStartTime() {
+    this._startAt = process.hrtime()
+    this._startTime = new Date()
+  }
+
+  _getip(req) {
+    return req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress) || undefined;
+  }
+  ////////
 
   setLogLevel(level) {
     this._level = this._levelValue(level);

@@ -1,5 +1,6 @@
 const fs = require('fs'),
       assert = require('assert'),
+      request = require('supertest'),
       Marvin = require('../index.js');
 
 var deleteFolderRecursive = function(path) {
@@ -598,6 +599,30 @@ describe('File logging', function() {
     assert.ok(fs.existsSync('./test-tmp/' + formattedDate + '.log'));
     deleteFolderRecursive('./test-tmp/');
     done();
+  });
+
+});
+
+describe('Express middleware logger', function() {
+
+  it('should correctly log http request', done => {
+    var express = require('express'),
+        app = express(),
+        logger = new Marvin({
+          consoleCallback: function() {
+            assert.ok(/\[.*?\] \/ \([0-9. ms]*\) \d{3} [0-9a-f.:]*/i.test(arguments['2']));
+            done();
+          }
+        }),
+        tester = null;
+
+    app.use(logger.expressMiddleWare());
+    app.get('*', function (req, res) {res.send('OK');});
+
+    app.listen(4200, () => {
+      tester = request(app).get('/');
+      tester = tester.expect(404, () => {});
+    });
   });
 
 });
