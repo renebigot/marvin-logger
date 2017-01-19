@@ -77,6 +77,16 @@ If the log data begins with brackets ('[...]'), only the text between the bracke
 logger.important('[MyApp] Super important log message'); // Only 'MyApp' will be shown in magenta  
 ```
 
+To use `marvin-logger` as an expressjs middleware logger:
+
+```javascript
+var express = require('express'),
+    app = express(),
+    logger = new Marvin();
+
+app.use(logger.expressMiddleWare());
+```
+
 
 ## Scripts
 
@@ -91,9 +101,13 @@ Package | Version | Dev
 --- |:---:|:---:
 [colors](https://www.npmjs.com/package/colors) | ^1.1.2 | ✖
 [file-stream-rotator](https://www.npmjs.com/package/file-stream-rotator) | 0.0.7 | ✖
+[on-finished](https://www.npmjs.com/package/on-finished) | ^2.3.0 | ✖
+[on-headers](https://www.npmjs.com/package/on-headers) | ^1.0.1 | ✖
+[express](https://www.npmjs.com/package/express) | ^4.14.0 | ✔
 [istanbul](https://www.npmjs.com/package/istanbul) | ^0.4.5 | ✔
 [mocha](https://www.npmjs.com/package/mocha) | ^3.2.0 | ✔
 [node-readme](https://www.npmjs.com/package/node-readme) | ^0.1.9 | ✔
+[supertest](https://www.npmjs.com/package/supertest) | ^2.0.1 | ✔
 [supervisor](https://www.npmjs.com/package/supervisor) | ^0.12.0 | ✔
 
 
