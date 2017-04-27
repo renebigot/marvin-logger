@@ -12,16 +12,18 @@ const fs = require('fs'),
 
 class Marvin {
   constructor(opts) {
-    /*
-    Defaults :
-    level: debug        // Minimal level to log
-    logOutputDirectory: undefined        // Log output directory
-    consoleCallback: undefined        // console.log substitution
-    fileCallback: undefined        // file logger substitution
-    */
-
     opts = opts || {};
     this.setLogLevel(opts.level || 'debug');
+
+    this.setDebugFilter(opts.debugFilter || null);
+    this.setInfoFilter(opts.infoFilter || null);
+    this.setWarnFilter(opts.warnFilter || null);
+    this.setErrorFilter(opts.errorFilter || null);
+    this.setHttpFilter(opts.httpFilter || null);
+    this.setImportantFilter(opts.importantFilter || null);
+
+    this._logFormat = opts.logFormat || '{{DATETIME}} {{PID}} {{LOG}}';
+
     this._logOutputDirectory = opts.logOutputDirectory ? path.resolve(opts.logOutputDirectory) : false;
 
     this._consoleCallback = opts.consoleCallback || console.log;
@@ -42,7 +44,6 @@ class Marvin {
 
   }
 
-  ////////
   expressMiddleWare() {
     var that = this;
     return function logger(req, res, next) {
@@ -79,22 +80,36 @@ class Marvin {
     }
   }
 
-  _recordStartTime() {
-    this._startAt = process.hrtime()
-    this._startTime = new Date()
-  }
-
-  _getip(req) {
-    return req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress) || undefined;
-  }
-  ////////
-
   setLogLevel(level) {
     this._level = this._levelValue(level);
   }
 
+  setDebugFilter(filter) {
+    this._debugFilter = filter;
+  }
+
+  setInfoFilter(filter) {
+    this._infoFilter = filter;
+  }
+
+  setWarnFilter(filter) {
+    this._warnFilter = filter;
+  }
+
+  setErrorFilter(filter) {
+    this._errorFilter = filter;
+  }
+
+  setHttpFilter(filter) {
+    this._httpFilter = filter;
+  }
+
+  setImportantFilter(filter) {
+    this._importantFilter = filter;
+  }
+
   debug() {
-    if (this._level > DEBUG) {
+    if (this._level > DEBUG || this._isExcludedByFilter(this._debugFilter, arguments)) {
       return false;
     }
 
@@ -102,7 +117,7 @@ class Marvin {
   }
 
   info() {
-    if (this._level > INFO) {
+    if (this._level > INFO || this._isExcludedByFilter(this._infoFilter, arguments)) {
       return false;
     }
 
@@ -110,7 +125,7 @@ class Marvin {
   }
 
   warn() {
-    if (this._level > WARN) {
+    if (this._level > WARN || this._isExcludedByFilter(this._warnFilter, arguments)) {
       return false;
     }
 
@@ -118,7 +133,7 @@ class Marvin {
   }
 
   error() {
-    if (this._level > ERROR) {
+    if (this._level > ERROR || this._isExcludedByFilter(this._errorFilter, arguments)) {
       return false;
     }
 
@@ -126,10 +141,18 @@ class Marvin {
   }
 
   important() {
+    if (this._isExcludedByFilter(this._importantFilter, arguments)) {
+      return false;
+    }
+
     return this._writeLog(arguments, colors.important);
   }
 
   http() {
+    if (this._isExcludedByFilter(this._httpFilter, arguments)) {
+      return false;
+    }
+
     return this._writeLog(arguments, colors.http);
   }
 
@@ -150,6 +173,23 @@ class Marvin {
       default:
         return DEBUG;
     }
+  }
+
+  _isExcludedByFilter(filter, args) {
+    var data = this._argumentsToString(args);
+
+    if (!filter) {
+      // if no filter set, data is not excluded
+      return false;
+
+    } else if (typeof filter === 'string') {
+      // If data do not contain filter, exclude
+      return data.indexOf(filter) < 0;
+
+    }
+
+    // If data match filter, do not exclude
+    return !filter.test(data);
   }
 
   /* Convert date to YYYY/MM/DD hh:mm:ss */
@@ -227,7 +267,26 @@ class Marvin {
   }
 
   _writeLog(args, color) {
+    var data = this._argumentsToString(args);
+    var log = '' + this._logFormat;
+
+    // Log to console
+    this._consoleCallback(log.replace('{{DATETIME}}', this._formattedTimeForLogging(new Date()))
+                          .replace('{{PID}}', this._coloredPid())
+                          .replace('{{LOG}}', this._coloredString(data, color)));
+
+    // Log to file
+    this._fileCallback(log.replace('{{DATETIME}}', this._formattedDateForLogging(new Date()))
+                       .replace('{{PID}}', this._pid())
+                       .replace('{{LOG}}', data)
+                       + '\n');
+
+    return true;
+  }
+
+  _argumentsToString(args) {
     var data = '';
+
     Object.keys(args).forEach(argi => {
       var tmpData = args[argi];
 
@@ -242,17 +301,18 @@ class Marvin {
       data = data.substr(0, data.length - 1);
     }
 
-    // Log to console
-    this._consoleCallback(this._formattedTimeForLogging(new Date()),
-                          this._coloredPid(),
-                          this._coloredString(data, color));
-
-    // Log to file
-    this._fileCallback(this._formattedDateForLogging(new Date()) +
-                       ' ' + this._pid() + ' ' + data + '\n');
-
-    return true;
+    return data;
   }
+
+  _recordStartTime() {
+    this._startAt = process.hrtime()
+    this._startTime = new Date()
+  }
+
+  _getip(req) {
+    return req.ip || req._remoteAddress || (req.connection && req.connection.remoteAddress) || undefined;
+  }
+
 }
 
 module.exports = Marvin;

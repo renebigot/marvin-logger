@@ -99,27 +99,28 @@ describe('Log levels', function() {
     var expectedCount = 6,
         logger = new Marvin({
           level: 'debug',
-          consoleCallback: function() {
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
             assert.ok(expectedCount > 0);
 
             switch(expectedCount) {
               case 1:
-                assert.ok(/http/.test(arguments['2']));
+                assert.ok(/http/.test(log));
                 break;
               case 2:
-                assert.ok(/important/.test(arguments['2']));
+                assert.ok(/important/.test(log));
                 break;
               case 3:
-                assert.ok(/error/.test(arguments['2']));
+                assert.ok(/error/.test(log));
                 break;
               case 4:
-                assert.ok(/warn/.test(arguments['2']));
+                assert.ok(/warn/.test(log));
                 break;
               case 5:
-                assert.ok(/info/.test(arguments['2']));
+                assert.ok(/info/.test(log));
                 break;
               case 6:
-                assert.ok(/debug/.test(arguments['2']));
+                assert.ok(/debug/.test(log));
                 break;
             }
 
@@ -143,24 +144,25 @@ describe('Log levels', function() {
     var expectedCount = 5,
         logger = new Marvin({
           level: 'info',
-          consoleCallback: function() {
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
             assert.ok(expectedCount > 0);
 
             switch(expectedCount) {
               case 1:
-                assert.ok(/http/.test(arguments['2']));
+                assert.ok(/http/.test(log));
                 break;
               case 2:
-                assert.ok(/important/.test(arguments['2']));
+                assert.ok(/important/.test(log));
                 break;
               case 3:
-                assert.ok(/error/.test(arguments['2']));
+                assert.ok(/error/.test(log));
                 break;
               case 4:
-                assert.ok(/warn/.test(arguments['2']));
+                assert.ok(/warn/.test(log));
                 break;
               case 5:
-                assert.ok(/info/.test(arguments['2']));
+                assert.ok(/info/.test(log));
                 break;
             }
 
@@ -184,21 +186,22 @@ describe('Log levels', function() {
     var expectedCount = 4,
         logger = new Marvin({
           level: 'warn',
-          consoleCallback: function() {
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
             assert.ok(expectedCount > 0);
 
             switch(expectedCount) {
               case 1:
-                assert.ok(/http/.test(arguments['2']));
+                assert.ok(/http/.test(log));
                 break;
               case 2:
-                assert.ok(/important/.test(arguments['2']));
+                assert.ok(/important/.test(log));
                 break;
               case 3:
-                assert.ok(/error/.test(arguments['2']));
+                assert.ok(/error/.test(log));
                 break;
               case 4:
-                assert.ok(/warn/.test(arguments['2']));
+                assert.ok(/warn/.test(log));
                 break;
             }
 
@@ -222,18 +225,19 @@ describe('Log levels', function() {
     var expectedCount = 3,
         logger = new Marvin({
           level: 'error',
-          consoleCallback: function() {
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
             assert.ok(expectedCount > 0);
 
             switch(expectedCount) {
               case 1:
-                assert.ok(/http/.test(arguments['2']));
+                assert.ok(/http/.test(log));
                 break;
               case 2:
-                assert.ok(/important/.test(arguments['2']));
+                assert.ok(/important/.test(log));
                 break;
               case 3:
-                assert.ok(/error/.test(arguments['2']));
+                assert.ok(/error/.test(log));
                 break;
             }
 
@@ -257,15 +261,16 @@ describe('Log levels', function() {
     var expectedCount = 2,
         logger = new Marvin({
           level: 'none',
-          consoleCallback: function() {
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
             assert.ok(expectedCount > 0);
 
             switch(expectedCount) {
               case 1:
-                assert.ok(/http/.test(arguments['2']));
+                assert.ok(/http/.test(log));
                 break;
               case 2:
-                assert.ok(/important/.test(arguments['2']));
+                assert.ok(/important/.test(log));
                 break;
             }
 
@@ -287,6 +292,44 @@ describe('Log levels', function() {
 
 });
 
+describe('Log filters', function() {
+
+  it('should not exclude messages without filter', done => {
+    var expectedCount = 2,
+        logger = new Marvin({
+          level: 'debug',
+        });
+
+    assert.equal(logger._isExcludedByFilter(null, ['not filtered']), false);
+    assert.equal(logger._isExcludedByFilter(false, ['not filtered']), false);
+    assert.equal(logger._isExcludedByFilter('', ['not filtered']), false);
+    done();
+  });
+
+  it('should exclude messages with string filter', done => {
+    var expectedCount = 2,
+        logger = new Marvin({
+          level: 'debug',
+        });
+
+    assert.equal(logger._isExcludedByFilter('test', ['should pass with the word test']), false);
+    assert.equal(logger._isExcludedByFilter('test', ['should not pass without']), true);
+    done();
+  });
+
+  it('should exclude messages with regex filter', done => {
+    var expectedCount = 2,
+        logger = new Marvin({
+          level: 'debug',
+        });
+
+    assert.equal(logger._isExcludedByFilter(/^start/, ['starts with start']), false);
+    assert.equal(logger._isExcludedByFilter(/^start/, ['excluded since start is not the first word']), true);
+    done();
+  });
+
+});
+
 describe('Console logging', function() {
 
   it('should correctly format date for console', done => {
@@ -297,8 +340,9 @@ describe('Console logging', function() {
         ':' + ('0' + now.getSeconds()).slice(-2) +
         '\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(arguments['0'], expected);
+          logFormat: '{{DATETIME}}',
+          consoleCallback: function(date) {
+            assert.equal(date, expected);
             done();
           }
         });
@@ -309,8 +353,9 @@ describe('Console logging', function() {
   it('should correctly format pid for console', done => {
     var expected = '\u001b[35mPID_' + process.pid + '\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(arguments['1'], expected);
+          logFormat: '{{PID}}',
+          consoleCallback: function(pid) {
+            assert.equal(pid, expected);
             done();
           }
         });
@@ -321,9 +366,9 @@ describe('Console logging', function() {
   it('should correctly format data with brackets for console', done => {
     var expected = '[\u001b[34mbrackets\u001b[39m] test',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -334,9 +379,9 @@ describe('Console logging', function() {
   it('should correctly format object data for console', done => {
     var expected = '\u001b[34m{\n  "foo": "bar"\n}\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -347,9 +392,9 @@ describe('Console logging', function() {
   it('should correctly format debug data for console', done => {
     var expected = '\u001b[34mtest\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -360,9 +405,9 @@ describe('Console logging', function() {
   it('should correctly format info data for console', done => {
     var expected = '\u001b[32mtest\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -373,9 +418,9 @@ describe('Console logging', function() {
   it('should correctly format warn data for console', done => {
     var expected = '\u001b[33mtest\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -386,9 +431,9 @@ describe('Console logging', function() {
   it('should correctly format error data for console', done => {
     var expected = '\u001b[31mtest\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -399,9 +444,9 @@ describe('Console logging', function() {
   it('should correctly format important data for console', done => {
     var expected = '\u001b[35mtest\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -412,9 +457,9 @@ describe('Console logging', function() {
   it('should correctly format http data for console', done => {
     var expected = '\u001b[36mtest\u001b[39m',
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.equal(Object.keys(arguments).length, 3);
-            assert.equal(arguments['2'], expected);
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -434,13 +479,14 @@ describe('File logging', function() {
           '/' + ('0' + now.getDate()).slice(-2),
           ('0' + now.getHours()).slice(-2) +
           ':' + ('0' + now.getMinutes()).slice(-2) +
-          ':' + ('0' + now.getSeconds()).slice(-2)
+          ':' + ('0' + now.getSeconds()).slice(-2) + '\n'
         ],
         logger = new Marvin({
           consoleCallback: function() {},
-          fileCallback: function() {
-            assert.equal(arguments['0'].split(' ')[0], expected[0]);
-            assert.equal(arguments['0'].split(' ')[1], expected[1]);
+          logFormat: '{{DATETIME}}',
+          fileCallback: function(date) {
+            assert.equal(date.split(' ')[0], expected[0]);
+            assert.equal(date.split(' ')[1], expected[1]);
             done();
           }
         });
@@ -449,11 +495,12 @@ describe('File logging', function() {
   });
 
   it('should correctly format pid for file', done => {
-    var expected = 'PID_' + process.pid,
+    var expected = 'PID_' + process.pid + '\n',
         logger = new Marvin({
           consoleCallback: function() {},
-          fileCallback: function() {
-            assert.equal(arguments['0'].split(' ')[2], expected);
+          logFormat: '{{PID}}',
+          fileCallback: function(pid) {
+            assert.equal(pid, expected);
             done();
           }
         });
@@ -464,11 +511,10 @@ describe('File logging', function() {
   it('should correctly format debug data for file', done => {
     var expected = 'test\n',
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 4);
-            assert.equal(fields[3], expected);
+          fileCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -482,12 +528,10 @@ describe('File logging', function() {
       'test\n'
     ],
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 5);
-            assert.equal(fields[3], expected[0]);
-            assert.equal(fields[4], expected[1]);
+          fileCallback: function(log) {
+            assert.equal(log, expected.join(' '));
             done();
           }
         });
@@ -496,11 +540,12 @@ describe('File logging', function() {
   });
 
   it('should correctly format object data for file', done => {
-    var expected = /\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2} PID_\d+ {\n  "foo": "bar"\n}\n/,
+    var expected = /{\n  "foo": "bar"\n}\n/,
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            assert.ok(expected.test(arguments['0']));
+          fileCallback: function(log) {
+            assert.ok(expected.test(log));
             done();
           }
         });
@@ -511,11 +556,10 @@ describe('File logging', function() {
   it('should correctly format info data for file', done => {
     var expected = 'test\n',
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 4);
-            assert.equal(fields[3], expected);
+          fileCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -526,11 +570,10 @@ describe('File logging', function() {
   it('should correctly format warn data for file', done => {
     var expected = 'test\n',
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 4);
-            assert.equal(fields[3], expected);
+          fileCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -541,11 +584,10 @@ describe('File logging', function() {
   it('should correctly format error data for file', done => {
     var expected = 'test\n',
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 4);
-            assert.equal(fields[3], expected);
+          fileCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -556,11 +598,10 @@ describe('File logging', function() {
   it('should correctly format important data for file', done => {
     var expected = 'test\n',
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 4);
-            assert.equal(fields[3], expected);
+          fileCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -571,11 +612,10 @@ describe('File logging', function() {
   it('should correctly format http data for file', done => {
     var expected = 'test\n',
         logger = new Marvin({
+          logFormat: '{{LOG}}',
           consoleCallback: function() {},
-          fileCallback: function() {
-            var fields = arguments['0'].split(' ');
-            assert.equal(fields.length, 4);
-            assert.equal(fields[3], expected);
+          fileCallback: function(log) {
+            assert.equal(log, expected);
             done();
           }
         });
@@ -609,8 +649,9 @@ describe('Express middleware logger', function() {
     var express = require('express'),
         app = express(),
         logger = new Marvin({
-          consoleCallback: function() {
-            assert.ok(/\[.*?\] \/ \([0-9. ms]*\) \d{3} [0-9a-f.:]*/i.test(arguments['2']));
+          logFormat: '{{LOG}}',
+          consoleCallback: function(log) {
+            assert.ok(/\[.*?\] \/ \([0-9. ms]*\) \d{3} [0-9a-f.:]*/i.test(log));
             done();
           }
         }),

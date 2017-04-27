@@ -49,6 +49,22 @@ var Marvin = require('marvin-logger'),
     });
 ```
 
+
+Default log format is `{{DATETIME}} {{PID}} {{LOG}}` with :
+* {{DATETIME}} : Date + time (for file log) or time (for console log)
+* {{PID}} : Current process PID (useful for clusters)
+* {{LOG}} : Log message
+
+Log format can be specified at init time :
+
+```javascript
+var Marvin = require('marvin-logger'),
+    logger = new Marvin({
+      logFormat: '{{DATETIME}} - {{LOG}}'
+      logOutputDirectory: './logs'
+    });
+```
+
 Log some debug data : 
 
 ```javascript
@@ -72,6 +88,13 @@ In this example, only `error()`, `important()` and `http()` will be able to disp
 
 `important()` and `http()` are always shown. You can use them to display important data like critical states or http access (or what ever you want).
 
+To change log leve : 
+
+```javascript
+logger.setLogLevel('info'); // level >= INFO
+logger.setLogLevel('none'); // only HTTP & IMPORTANT
+```
+
 If the log data begins with brackets ('[...]'), only the text between the brackets will be colorized.
 
 ```javascript
@@ -88,6 +111,30 @@ var express = require('express'),
 app.use(logger.expressMiddleWare());
 ```
 
+To filter, you can specify wich string or Regex your messages should match, one filter per log level:
+
+```javascript
+var Marvin = require('marvin-logger'),
+logger = new Marvin({
+errorFilter: 'my-filter-string,
+debugFilter: 'my-filter-regex,
+});
+```
+
+Available filters are : `debugFilter`, `infoFilter`, `warnFilter`, `errorFilter`, `importantFilter` and `httpFilter`.
+
+Messages not matching filters are neither written to console nor file.
+
+To change a filter after init : 
+
+```javascript
+logger.setDebugFilter(null);
+logger.setInfoFilter('my-string');
+logger.setWarnFilter('my-string');
+logger.setErrorFilter('');
+logger.setImportantFilter(/my-[regx]/i);
+logger.setHttpFilter(/[^htp]/i);
+```
 
 ## Scripts
 
