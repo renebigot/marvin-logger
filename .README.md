@@ -115,10 +115,10 @@ To filter, you can specify wich string or Regex your messages should match, one 
 
 ```javascript
 var Marvin = require('marvin-logger'),
-logger = new Marvin({
-errorFilter: 'my-filter-string,
-debugFilter: 'my-filter-regex,
-});
+    logger = new Marvin({
+      errorFilter: 'my-filter-string',
+      debugFilter: 'my-filter-regex',
+    });
 ```
 
 Available filters are : `debugFilter`, `infoFilter`, `warnFilter`, `errorFilter`, `importantFilter` and `httpFilter`.
