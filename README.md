@@ -88,7 +88,7 @@ In this example, only `error()`, `important()` and `http()` will be able to disp
 
 `important()` and `http()` are always shown. You can use them to display important data like critical states or http access (or what ever you want).
 
-To change log leve : 
+To change log level : 
 
 ```javascript
 logger.setLogLevel('info'); // level >= INFO
@@ -134,6 +134,14 @@ logger.setWarnFilter('my-string');
 logger.setErrorFilter('');
 logger.setImportantFilter(/my-[regx]/i);
 logger.setHttpFilter(/[^htp]/i);
+```
+
+To use ```marvin-logger``` as a singleton insance : 
+
+```javascript
+var logger = require('marvin-logger').sharedInstance;
+sharedInstance.setLogDirectory('logs');
+sharedInstance.setLogLevel('debug');
 ```
 
 ## Scripts

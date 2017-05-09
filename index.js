@@ -11,6 +11,14 @@ const fs = require('fs'),
       NONE = 4;
 
 class Marvin {
+  static get sharedInstance() {
+    if (this._sharedInstance === undefined) {
+      this._sharedInstance = new this();
+    }
+    return this._sharedInstance;
+  }
+  static set sharedInstance() {/* No setter, singleton */}
+
   constructor(opts) {
     opts = opts || {};
     this.setLogLevel(opts.level || 'debug');
@@ -21,10 +29,9 @@ class Marvin {
     this.setErrorFilter(opts.errorFilter || null);
     this.setHttpFilter(opts.httpFilter || null);
     this.setImportantFilter(opts.importantFilter || null);
+    this.setLogOutputDirectory(opts.logOutputDirectory);
 
     this._logFormat = opts.logFormat || '{{DATETIME}} {{PID}} {{LOG}}';
-
-    this._logOutputDirectory = opts.logOutputDirectory ? path.resolve(opts.logOutputDirectory) : false;
 
     this._consoleCallback = opts.consoleCallback || console.log;
     this._fileCallback = opts.fileCallback || this._fileLog;
@@ -78,6 +85,10 @@ class Marvin {
 
       next();
     }
+  }
+
+  setLogOutputDirectory(path) {
+    this._logOutputDirectory = path ? path.resolve(path) : false;
   }
 
   setLogLevel(level) {
