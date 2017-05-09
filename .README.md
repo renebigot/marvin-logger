@@ -140,8 +140,8 @@ To use ```marvin-logger``` as a singleton insance :
 
 ```javascript
 var logger = require('marvin-logger').sharedInstance;
-sharedInstance.setLogDirectory('logs');
-sharedInstance.setLogLevel('debug');
+logger.setLogDirectory('logs');
+logger.setLogLevel('debug');
 ```
 
 ## Scripts
