@@ -87,8 +87,8 @@ class Marvin {
     }
   }
 
-  setLogOutputDirectory(path) {
-    this._logOutputDirectory = path ? path.resolve(path) : false;
+  setLogOutputDirectory(logOutputDirectory) {
+    this._logOutputDirectory = logOutputDirectory ? path.resolve(logOutputDirectory) : false;
   }
 
   setLogLevel(level) {
