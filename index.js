@@ -17,7 +17,7 @@ class Marvin {
     }
     return this._sharedInstance;
   }
-  static set sharedInstance() {/* No setter, singleton */}
+  static set sharedInstance(value) {/* No setter, singleton */}
 
   constructor(opts) {
     opts = opts || {};
