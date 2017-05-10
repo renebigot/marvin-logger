@@ -328,6 +328,78 @@ describe('Log filters', function() {
     done();
   });
 
+  it('should exclude debug with filter', done => {
+    var logger = new Marvin({
+      level: 'debug',
+      debugFilter: 'pass',
+      consoleCallback: () => {}
+    });
+
+    assert.equal(logger.debug('should pass'), true);
+    assert.equal(logger.debug('is filtered'), false);
+    done();
+  });
+
+  it('should exclude info with filter', done => {
+    var logger = new Marvin({
+      level: 'debug',
+      infoFilter: 'pass',
+      consoleCallback: () => {}
+    });
+
+    assert.equal(logger.info('should pass'), true);
+    assert.equal(logger.info('is filtered'), false);
+    done();
+  });
+
+  it('should exclude warn with filter', done => {
+    var logger = new Marvin({
+      level: 'debug',
+      warnFilter: 'pass',
+      consoleCallback: () => {}
+    });
+
+    assert.equal(logger.warn('should pass'), true);
+    assert.equal(logger.warn('is filtered'), false);
+    done();
+  });
+
+  it('should exclude error with filter', done => {
+    var logger = new Marvin({
+      level: 'debug',
+      errorFilter: 'pass',
+      consoleCallback: () => {}
+    });
+
+    assert.equal(logger.error('should pass'), true);
+    assert.equal(logger.error('is filtered'), false);
+    done();
+  });
+
+  it('should exclude http with filter', done => {
+    var logger = new Marvin({
+      level: 'debug',
+      httpFilter: 'pass',
+      consoleCallback: () => {}
+    });
+
+    assert.equal(logger.http('should pass'), true);
+    assert.equal(logger.http('is filtered'), false);
+    done();
+  });
+
+  it('should exclude important with filter', done => {
+    var logger = new Marvin({
+      level: 'debug',
+      importantFilter: 'pass',
+      consoleCallback: () => {}
+    });
+
+    assert.equal(logger.important('should pass'), true);
+    assert.equal(logger.important('is filtered'), false);
+    done();
+  });
+
 });
 
 describe('Console logging', function() {
@@ -664,6 +736,25 @@ describe('Express middleware logger', function() {
       tester = request(app).get('/');
       tester = tester.expect(404, () => {});
     });
+  });
+
+});
+
+describe('Express middleware logger', function() {
+
+  it('should create marvin singleton', done => {
+    var logger = Marvin.sharedInstance;
+    assert.ok(logger);
+    assert.equal(typeof logger.debug, 'function');
+    done();
+  });
+
+  it('should not modify marvin singleton', done => {
+    var logger = Marvin.sharedInstance;
+    assert.ok(logger);
+    Marvin.sharedInstance = 'test';
+    assert.ok(Marvin.sharedInstance !== 'test');
+    done();
   });
 
 });
