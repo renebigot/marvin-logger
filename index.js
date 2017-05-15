@@ -1,3 +1,5 @@
+require('node-json-color-stringify');
+
 const fs = require('fs'),
       path = require('path'),
       onFinished = require('on-finished'),
@@ -278,31 +280,34 @@ class Marvin {
   }
 
   _writeLog(args, color) {
-    var data = this._argumentsToString(args);
     var log = '' + this._logFormat;
 
     // Log to console
     this._consoleCallback(log.replace('{{DATETIME}}', this._formattedTimeForLogging(new Date()))
                           .replace('{{PID}}', this._coloredPid())
-                          .replace('{{LOG}}', this._coloredString(data, color)));
+                          .replace('{{LOG}}', this._coloredString(this._argumentsToString(args, true), color)));
 
     // Log to file
     this._fileCallback(log.replace('{{DATETIME}}', this._formattedDateForLogging(new Date()))
                        .replace('{{PID}}', this._pid())
-                       .replace('{{LOG}}', data)
+                       .replace('{{LOG}}', this._argumentsToString(args, false))
                        + '\n');
 
     return true;
   }
 
-  _argumentsToString(args) {
+  _argumentsToString(args, color) {
     var data = '';
 
     Object.keys(args).forEach(argi => {
       var tmpData = args[argi];
 
       if (typeof tmpData === 'object') {
-        tmpData = JSON.stringify(tmpData, null, 2);
+        if (color) {
+          tmpData = JSON.colorStringify(tmpData, null, 2);
+        } else {
+          tmpData = JSON.stringify(tmpData, null, 2);
+        }
       }
 
       data += tmpData + ' ';

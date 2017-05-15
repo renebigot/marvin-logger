@@ -449,7 +449,7 @@ describe('Console logging', function() {
   });
 
   it('should correctly format object data for console', done => {
-    var expected = '\u001b[34m{\n  "foo": "bar"\n}\u001b[39m',
+    var expected = '\u001b[34m\u001b[90m{\n\u001b[34m  \u001b[90m\"\u001b[34m\u001b[35mfoo\u001b[34m\u001b[90m\":\u001b[34m \u001b[90m\"\u001b[34m\u001b[32mbar\u001b[34m\u001b[90m\"\u001b[34m\n\u001b[90m}\u001b[34m\u001b[39m',
         logger = new Marvin({
           logFormat: '{{LOG}}',
           consoleCallback: function(log) {
