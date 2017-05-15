@@ -157,6 +157,7 @@ Package | Version | Dev
 --- |:---:|:---:
 [colors](https://www.npmjs.com/package/colors) | ^1.1.2 | ✖
 [file-stream-rotator](https://www.npmjs.com/package/file-stream-rotator) | 0.0.7 | ✖
+[node-json-color-stringify](https://www.npmjs.com/package/node-json-color-stringify) | ^1.1.0 | ✖
 [on-finished](https://www.npmjs.com/package/on-finished) | ^2.3.0 | ✖
 [on-headers](https://www.npmjs.com/package/on-headers) | ^1.0.1 | ✖
 [express](https://www.npmjs.com/package/express) | ^4.14.0 | ✔
